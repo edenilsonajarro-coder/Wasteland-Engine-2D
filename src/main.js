@@ -8,10 +8,12 @@ import { DebugOverlay } from "./engine/debug/DebugOverlay.js";
 import { TestScene } from "./scenes/TestScene.js";
 
 const canvas = document.querySelector("#game-canvas");
+const joystick = document.querySelector("#joystick");
+const joystickKnob = document.querySelector("#joystick-knob");
 const renderer = new CanvasRenderer(canvas);
 const events = new EventBus();
 const assets = new AssetManager();
-const input = new InputManager(canvas);
+const input = new InputManager(canvas, joystick, joystickKnob);
 const scenes = new SceneManager({ renderer, input, events, assets });
 const debug = new DebugOverlay();
 const engine = new GameEngine({ renderer, scenes, input, events, debug });
@@ -32,9 +34,7 @@ events.on("debug:frame", (stats) => {
   document.querySelector("#resolution-label").textContent = `${renderer.width} × ${renderer.height}`;
 });
 
-// Measure the canvas before entering the first scene.
 renderer.resize();
-
 scenes.register("test", new TestScene({ name: "Prueba de renderizado", variant: 0 }));
 scenes.register("layers", new TestScene({ name: "Prueba de capas", variant: 1 }));
 scenes.switchTo("test");
@@ -44,14 +44,13 @@ pauseButton.addEventListener("click", () => {
   pauseButton.textContent = paused ? "Reanudar" : "Pausar";
 });
 sceneButton.addEventListener("click", () => {
-  const next = scenes.currentName === "test" ? "layers" : "test";
-  scenes.switchTo(next);
+  scenes.switchTo(scenes.currentName === "test" ? "layers" : "test");
 });
 debugButton.addEventListener("click", () => {
   const visible = debug.toggle();
   debugButton.textContent = `Depuración: ${visible ? "ON" : "OFF"}`;
   debugButton.setAttribute("aria-pressed", String(visible));
 });
-
 window.addEventListener("resize", () => renderer.resize());
+window.addEventListener("orientationchange", () => setTimeout(() => renderer.resize(), 150));
 engine.start();
