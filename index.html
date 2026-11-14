@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111820">
+<title>Wasteland Engine 2D — Fase 1</title>
+<link rel="stylesheet" href="./src/styles/main.css">
+</head>
+<body>
+<main class="app-shell">
+<header class="topbar">
+<div class="brand"><span class="brand-mark">W</span><div><strong>WASTELAND ENGINE</strong><small>2D · FASE 1 · NÚCLEO</small></div></div>
+<div class="status"><span class="status-dot"></span><span id="engine-status">INICIANDO</span></div>
+</header>
+<section class="game-panel" aria-label="Vista de prueba del motor">
+<div class="canvas-wrap"><canvas id="game-canvas" aria-label="Escenario de prueba 2D"></canvas><div class="canvas-overlay"><span>TEST SCENE</span><span id="resolution-label">—</span></div></div>
+<div class="toolbar">
+<button id="pause-button" type="button">Pausar</button>
+<button id="scene-button" type="button">Cambiar escena</button>
+<button id="debug-button" type="button" aria-pressed="true">Depuración: ON</button>
+</div>
+</section>
+<section class="info-grid">
+<article class="info-card"><h2>Estado del motor</h2><dl>
+<div><dt>FPS</dt><dd id="fps-value">0</dd></div><div><dt>Delta</dt><dd id="delta-value">0 ms</dd></div>
+<div><dt>Escena</dt><dd id="scene-value">—</dd></div><div><dt>Canvas</dt><dd id="canvas-value">—</dd></div>
+</dl></article>
+<article class="info-card"><h2>Controles de prueba</h2><p>Arrastra o toca el escenario para mover el marcador. En PC también puedes usar WASD o las flechas.</p><p class="hint">La entrada táctil y el escalado adaptable están incluidos desde esta fase.</p></article>
+</section>
+<footer>Wasteland Engine 2D · Prototipo técnico · No representa todavía el juego final</footer>
+</main>
+<script type="module" src="./src/main.js"></script>
+</body></html>
