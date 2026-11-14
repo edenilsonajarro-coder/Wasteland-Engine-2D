@@ -1,0 +1,39 @@
+import {GameEngine} from "./engine/core/GameEngine.js";
+import {CanvasRenderer} from "./engine/graphics/CanvasRenderer.js";
+import {SceneManager} from "./engine/scenes/SceneManager.js";
+import {AssetManager} from "./engine/assets/AssetManager.js";
+import {InputManager} from "./engine/input/InputManager.js";
+import {EventBus} from "./engine/events/EventBus.js";
+import {DebugOverlay} from "./engine/debug/DebugOverlay.js";
+import {TestScene} from "./scenes/TestScene.js";
+
+const canvas=document.querySelector("#game-canvas");
+const renderer=new CanvasRenderer(canvas);
+const events=new EventBus();
+const assets=new AssetManager();
+const input=new InputManager(canvas);
+const scenes=new SceneManager({renderer,input,events,assets});
+const debug=new DebugOverlay();
+const engine=new GameEngine({renderer,scenes,input,events,debug});
+scenes.register("test",new TestScene({name:"Prueba de renderizado",variant:0}));
+scenes.register("layers",new TestScene({name:"Prueba de capas",variant:1}));
+scenes.switchTo("test");
+
+const status=document.querySelector("#engine-status");
+const pauseButton=document.querySelector("#pause-button");
+const sceneButton=document.querySelector("#scene-button");
+const debugButton=document.querySelector("#debug-button");
+events.on("engine:ready",()=>{status.textContent="EN EJECUCIÓN";});
+events.on("scene:changed",({name})=>{document.querySelector("#scene-value").textContent=name;});
+events.on("debug:frame",stats=>{
+ document.querySelector("#fps-value").textContent=String(stats.fps);
+ document.querySelector("#delta-value").textContent=`${(stats.delta*1000).toFixed(1)} ms`;
+ document.querySelector("#canvas-value").textContent=`${renderer.width} × ${renderer.height}`;
+ document.querySelector("#resolution-label").textContent=`${renderer.width} × ${renderer.height}`;
+});
+pauseButton.addEventListener("click",()=>{const paused=engine.togglePause();pauseButton.textContent=paused?"Reanudar":"Pausar";});
+sceneButton.addEventListener("click",()=>scenes.switchTo(scenes.currentName==="test"?"layers":"test"));
+debugButton.addEventListener("click",()=>{const visible=debug.toggle();debugButton.textContent=`Depuración: ${visible?"ON":"OFF"}`;debugButton.setAttribute("aria-pressed",String(visible));});
+window.addEventListener("resize",()=>renderer.resize());
+renderer.resize();
+engine.start();
