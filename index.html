@@ -8,13 +8,21 @@
 <link rel="stylesheet" href="./src/styles/main.css">
 </head>
 <body>
+<div class="rotate-notice"><div class="rotate-icon">↻</div><strong>Gira tu teléfono</strong><span>Wasteland Engine está diseñado para jugarse en horizontal.</span></div>
 <main class="app-shell">
 <header class="topbar">
 <div class="brand"><span class="brand-mark">W</span><div><strong>WASTELAND ENGINE</strong><small>2D · FASE 1 · NÚCLEO</small></div></div>
 <div class="status"><span class="status-dot"></span><span id="engine-status">INICIANDO</span></div>
 </header>
 <section class="game-panel" aria-label="Vista de prueba del motor">
-<div class="canvas-wrap"><canvas id="game-canvas" aria-label="Escenario de prueba 2D"></canvas><div class="canvas-overlay"><span>TEST SCENE</span><span id="resolution-label">—</span></div></div>
+<div class="canvas-wrap">
+<canvas id="game-canvas" aria-label="Escenario de prueba 2D"></canvas>
+<div class="canvas-overlay"><span>TEST SCENE</span><span id="resolution-label">—</span></div>
+<div id="joystick" class="joystick" aria-label="Joystick virtual">
+<div class="joystick-ring"></div><div id="joystick-knob" class="joystick-knob"></div>
+</div>
+<div class="control-hint">MOVER</div>
+</div>
 <div class="toolbar">
 <button id="pause-button" type="button">Pausar</button>
 <button id="scene-button" type="button">Cambiar escena</button>
@@ -26,7 +34,7 @@
 <div><dt>FPS</dt><dd id="fps-value">0</dd></div><div><dt>Delta</dt><dd id="delta-value">0 ms</dd></div>
 <div><dt>Escena</dt><dd id="scene-value">—</dd></div><div><dt>Canvas</dt><dd id="canvas-value">—</dd></div>
 </dl></article>
-<article class="info-card"><h2>Controles de prueba</h2><p>Arrastra o toca el escenario para mover el marcador. En PC también puedes usar WASD o las flechas.</p><p class="hint">La entrada táctil y el escalado adaptable están incluidos desde esta fase.</p></article>
+<article class="info-card"><h2>Controles</h2><p>Usa el joystick de la izquierda para moverte. En PC puedes usar WASD o las flechas.</p><p class="hint">Diseño horizontal y controles táctiles.</p></article>
 </section>
 <footer>Wasteland Engine 2D · Prototipo técnico · No representa todavía el juego final</footer>
 </main>
