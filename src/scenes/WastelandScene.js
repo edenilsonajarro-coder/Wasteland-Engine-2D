@@ -179,7 +179,7 @@ export class WastelandScene {
   placeStructure() {
     const type=this.pendingBuild||"storage";
     this.structures.push({type,x:Math.round((this.player.x+this.player.facingX*48)/32)*32,y:Math.round((this.player.y+this.player.facingY*48)/32)*32});
-    this.pendingBuild=null;this.buildMode=false;this.message="Construcción completada: "+type;this.messageTime=2.5;
+    this.pendingBuild=null;this.buildMode=false;this.interactHeld=true;this.message="Construcción completada: "+type;this.messageTime=2.5;
   }
   interact() {
     if(this.buildMode&&this.pendingBuild){this.placeStructure();return;}

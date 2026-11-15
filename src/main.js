@@ -4,9 +4,9 @@ import { SceneManager } from "./engine/scenes/SceneManager.js?v=4";
 import { AssetManager } from "./engine/assets/AssetManager.js?v=4";
 import { InputManager } from "./engine/input/InputManager.js?v=5";
 import { EventBus } from "./engine/events/EventBus.js?v=4";
-import { DebugOverlay } from "./engine/debug/DebugOverlay.js?v=4";
+import { DebugOverlay } from "./engine/debug/DebugOverlay.js?v=5";
 import { TestScene } from "./scenes/TestScene.js?v=4";
-import { WastelandScene } from "./scenes/WastelandScene.js?v=8";
+import { WastelandScene } from "./scenes/WastelandScene.js?v=9";
 
 const canvas = document.querySelector("#game-canvas");
 const joystick = document.querySelector("#joystick");
