@@ -164,8 +164,8 @@ export class WastelandScene {
       const x = e.x - cx, y = e.y - cy;
       if (x < -35 || y < -35 || x > w + 35 || y > h + 35) continue;
       const enemyDir = e.facingDir ?? 0;
-      const enemyRow = (e.moving ? 4 : 0) + enemyDir;
-      const enemyFrame = e.moving ? Math.floor(this.time * 7) % 4 : Math.floor(this.time * 2.4) % 2;
+      const enemyRow = e.hit > 0 ? 12 + enemyDir : (e.moving ? 4 : 0) + enemyDir;
+      const enemyFrame = e.hit > 0 ? Math.floor((.2 - e.hit) * 10) % 2 : (e.moving ? Math.floor(this.time * 7) % 4 : Math.floor(this.time * 2.4) % 2);
       if (!this.drawSheetFrame(renderer, "infected", enemyFrame, enemyRow, 4, x, y, 38)) {
         renderer.rect(x - 8, y - 6, 16, 15, e.hit > 0 ? "#c7a58a" : "#78834c");
         renderer.rect(x - 5, y - 13, 10, 8, "#9b9876");
@@ -176,8 +176,8 @@ export class WastelandScene {
     // Survivor
     const px = this.player.x - cx, py = this.player.y - cy;
     const playerDir = this.player.facingDir ?? 2;
-    const playerRow = (this.player.moving ? 4 : 0) + playerDir;
-    const playerFrame = this.player.moving ? Math.floor(this.time * 8.7) % 6 : Math.floor(this.time * 2.4) % 2;
+    const playerRow = this.player.attack > 0 ? 12 + playerDir : (this.player.moving ? 4 : 0) + playerDir;
+    const playerFrame = this.player.attack > 0 ? Math.min(3, Math.floor((.32 - this.player.attack) * 13)) : (this.player.moving ? Math.floor(this.time * 8.7) % 6 : Math.floor(this.time * 2.4) % 2);
     if (!this.drawSheetFrame(renderer, "survivor", playerFrame, playerRow, 6, px, py, 42)) {
       renderer.rect(px - 8, py - 5, 16, 16, "#354b42");
       renderer.rect(px - 6, py - 15, 12, 11, "#b18a61");
