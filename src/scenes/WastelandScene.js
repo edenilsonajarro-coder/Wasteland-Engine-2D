@@ -16,6 +16,7 @@ export class WastelandScene {
     this.sprites = {};
     this.loadSprite("survivor", "./assets/wasteland/characters/survivor_scavenger_32px.png");
     this.loadSprite("infected", "./assets/wasteland/enemies/infected_walker_32px.png");
+    this.loadSprite("terrainAtlas", "./assets/wasteland/terrain/wasteland_terrain_atlas.svg");
   }
 
   loadSprite(key, src) {
@@ -33,6 +34,31 @@ export class WastelandScene {
     const sx = Math.max(0, Math.min(image.width - frameW, column * frameW));
     const sy = Math.max(0, Math.min(image.height - frameH, row * frameH));
     renderer.context.drawImage(image, sx, sy, frameW, frameH,
+      Math.round(x - size / 2), Math.round(y - size / 2), size, size);
+    return true;
+  }
+
+  drawAtlasTile(renderer, col, row, x, y, size = 32) {
+    const image = this.sprites.terrainAtlas;
+    if (!image) return false;
+    renderer.context.drawImage(image, col * 16, row * 16, 16, 16,
+      Math.round(x), Math.round(y), size, size);
+    return true;
+  }
+
+  drawNature(renderer, kind, x, y, size = 42) {
+    const image = this.sprites.terrainAtlas;
+    if (!image) return false;
+    const sources = {
+      tree: [0, 48, 32, 48],
+      pine: [32, 48, 32, 48],
+      deadTree: [64, 48, 32, 48],
+      rock: [96, 48, 32, 48],
+      boulder: [0, 96, 32, 32],
+      log: [64, 96, 32, 32]
+    };
+    const src = sources[kind] || sources.rock;
+    renderer.context.drawImage(image, src[0], src[1], src[2], src[3],
       Math.round(x - size / 2), Math.round(y - size / 2), size, size);
     return true;
   }
@@ -139,10 +165,19 @@ export class WastelandScene {
     const left = Math.floor(cx / tile) - 1, top = Math.floor(cy / tile) - 1;
     for (let ty = top; ty < top + Math.ceil(h / tile) + 2; ty++) for (let tx = left; tx < left + Math.ceil(w / tile) + 2; tx++) {
       const n = this.random(tx, ty), x = tx * tile - cx, y = ty * tile - cy;
-      if (this.sprites.grass) renderer.context.drawImage(this.sprites.grass, Math.round(x), Math.round(y), tile, tile);
-      else {
+      const terrainCol = n > .94 ? 5 : n > .87 ? 3 : n > .78 ? 1 : 0;
+      const terrainRow = n > .965 ? 2 : n > .91 ? 1 : 0;
+      if (!this.drawAtlasTile(renderer, terrainCol, terrainRow, x, y, tile)) {
         const color = n > .91 ? "#5a6048" : n > .78 ? "#394c38" : (tx + ty) % 2 ? "#2d4436" : "#304838";
         this.drawTile(renderer, x, y, tile, color);
+      }
+      // Sparse, deterministic vegetation and stones; the same seed keeps the sector stable.
+      const decor = this.random(tx + 71, ty - 19);
+      if (decor > .986) {
+        const kind = decor > .997 ? "deadTree" : decor > .993 ? "pine" : "tree";
+        this.drawNature(renderer, kind, x + 16, y + 13, 38);
+      } else if (decor > .972) {
+        this.drawNature(renderer, "rock", x + 16, y + 16, 27);
       }
       if (n > .97) { renderer.rect(x + 8, y + 10, 2, 2, "#83906a"); renderer.rect(x + 23, y + 22, 3, 2, "#202c25"); }
     }
