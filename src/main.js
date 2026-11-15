@@ -6,7 +6,7 @@ import { InputManager } from "./engine/input/InputManager.js?v=4";
 import { EventBus } from "./engine/events/EventBus.js?v=4";
 import { DebugOverlay } from "./engine/debug/DebugOverlay.js?v=4";
 import { TestScene } from "./scenes/TestScene.js?v=4";
-import { WastelandScene } from "./scenes/WastelandScene.js?v=1";
+import { WastelandScene } from "./scenes/WastelandScene.js?v=2";
 
 const canvas = document.querySelector("#game-canvas");
 const joystick = document.querySelector("#joystick");
@@ -27,6 +27,8 @@ const debugButton = document.querySelector("#debug-button");
 events.on("engine:ready", () => { status.textContent = "EN EJECUCIÓN"; });
 events.on("scene:changed", ({ name }) => {
   document.querySelector("#scene-value").textContent = name;
+  const label = document.querySelector("#scene-overlay-label");
+  if (label) label.textContent = name === "wasteland" ? "WASTELAND · SECTOR 01" : name.toUpperCase();
 });
 events.on("debug:frame", (stats) => {
   document.querySelector("#fps-value").textContent = String(stats.fps);
