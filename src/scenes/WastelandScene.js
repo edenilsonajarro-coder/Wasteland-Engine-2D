@@ -61,9 +61,9 @@ export class WastelandScene {
       else if (d <= 22) { p.hp = Math.max(0, p.hp - 5 * dt); }
       enemy.hit = Math.max(0, enemy.hit - dt);
     }
-    if (input.isDown("Space") && p.attack <= 0) this.attack();
-    if (input.isDown("KeyE") && !this.interactHeld) { this.interact(); this.interactHeld = true; }
-    if (!input.isDown("KeyE")) this.interactHeld = false;
+    if ((input.isDown("Space") || input.isActionDown("attack")) && p.attack <= 0) this.attack();
+    if ((input.isDown("KeyE") || input.isActionDown("interact")) && !this.interactHeld) { this.interact(); this.interactHeld = true; }
+    if (!input.isDown("KeyE") && !input.isActionDown("interact")) this.interactHeld = false;
     for (let i = 1; i <= 4; i++) if (input.isDown("Digit" + i) && this.lastDigit !== i) { this.useSlot(i - 1); this.lastDigit = i; }
     if (![1,2,3,4].some(i => input.isDown("Digit" + i))) this.lastDigit = 0;
   }
