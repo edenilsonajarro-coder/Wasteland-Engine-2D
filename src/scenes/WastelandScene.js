@@ -146,14 +146,12 @@ export class WastelandScene {
     this.drawBar(renderer, 18, 49, 118, this.player.stamina, "#c2a34d", "RES");
     this.drawBar(renderer, 18, 63, 118, this.player.hunger, "#789653", "HAM");
     renderer.text("CHATARRA " + this.scrap, 145, 45, "#d6c79f", 9);
-    renderer.text("1 CUCHILLO  2 MED " + this.medkits, 12, h - 30, "#eee2c6", 9);
-    renderer.text("3 COMIDA " + this.food + "  4 CHATARRA", 12, h - 16, "#eee2c6", 9);
     if (this.messageTime > 0) {
       const msgWidth = Math.min(w - 24, Math.max(180, this.message.length * 6.2 + 24));
       renderer.rect((w - msgWidth) / 2, 84, msgWidth, 26, "rgba(8,13,12,.85)");
       renderer.text(this.message, (w - msgWidth) / 2 + 10, 101, "#f0dfb7", 10);
     }
-    renderer.text("WASD / FLECHAS · ESPACIO ATACAR · E SAQUEAR · 1-4 OBJETOS", 12, h - 48, "#aab6a1", 8);
+    // Los controles táctiles ya están visibles en pantalla; se evita duplicar instrucciones sobre el mapa.
   }
 
   drawBar(renderer, x, y, width, value, color, label) {
