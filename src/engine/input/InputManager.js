@@ -8,6 +8,9 @@ export class InputManager {
     this.actions = new Set();
     this.bindActionButton("attack-control", "attack");
     this.bindActionButton("interact-control", "interact");
+    this.bindActionButton("craft-control", "craft");
+    this.bindActionButton("build-control", "build");
+    this.bindActionButton("inventory-control", "inventory");
     this.pointerId = null;
     this.boundKeyDown = (event) => {
       this.keys.add(event.code);
