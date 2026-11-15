@@ -46,7 +46,7 @@ pauseButton.addEventListener("click", () => {
   pauseButton.textContent = paused ? "Reanudar" : "Pausar";
 });
 sceneButton.addEventListener("click", () => {
-  scenes.switchTo(scenes.currentName === "test" ? "layers" : "test");
+  scenes.switchTo(scenes.currentName === "wasteland" ? "test" : "wasteland");
 });
 debugButton.addEventListener("click", () => {
   const visible = debug.toggle();
