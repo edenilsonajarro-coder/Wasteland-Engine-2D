@@ -6,6 +6,7 @@ import { InputManager } from "./engine/input/InputManager.js?v=4";
 import { EventBus } from "./engine/events/EventBus.js?v=4";
 import { DebugOverlay } from "./engine/debug/DebugOverlay.js?v=4";
 import { TestScene } from "./scenes/TestScene.js?v=4";
+import { WastelandScene } from "./scenes/WastelandScene.js?v=1";
 
 const canvas = document.querySelector("#game-canvas");
 const joystick = document.querySelector("#joystick");
@@ -36,8 +37,9 @@ events.on("debug:frame", (stats) => {
 
 renderer.resize();
 scenes.register("test", new TestScene({ name: "Prueba de renderizado", variant: 0 }));
+scenes.register("wasteland", new WastelandScene());
 scenes.register("layers", new TestScene({ name: "Prueba de capas", variant: 1 }));
-scenes.switchTo("test");
+scenes.switchTo("wasteland");
 
 pauseButton.addEventListener("click", () => {
   const paused = engine.togglePause();
