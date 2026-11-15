@@ -5,6 +5,8 @@ export class WastelandScene {
     this.camera = { x: 0, y: 0 };
     this.enemies = [];
     this.crates = [];
+    this.resources = { madera: 0, piedra: 0, fibra: 0, chatarra: 0 };
+    this.resourceNodes = [];
     this.time = 0;
     this.message = "Explora el perímetro. Acércate a las cajas para saquear.";
     this.messageTime = 5;
@@ -78,13 +80,20 @@ export class WastelandScene {
     this.player.x = 0; this.player.y = 0;
     this.enemies = [];
     this.crates = [];
+    this.resourceNodes = [];
+    this.resources = { madera: 0, piedra: 0, fibra: 0, chatarra: 0 };
     for (let i = 0; i < 11; i++) {
       const a = i * 2.399;
       const d = 230 + this.random(i, 4) * 390;
       this.enemies.push({ x: Math.cos(a) * d, y: Math.sin(a) * d, hp: 40, maxHp: 40, speed: 30 + this.random(i, 8) * 18, hit: 0, dead: false });
     }
-    for (let y = -10; y <= 10; y++) for (let x = -14; x <= 14; x++) {
-      if (this.random(x, y) > .975) this.crates.push({ x: x * 64 + 32, y: y * 64 + 32, looted: false });
+    for (let y = -14; y <= 14; y++) for (let x = -18; x <= 18; x++) {
+      const roll = this.random(x + 311, y - 97);
+      if (roll > .987) this.crates.push({ x: x * 64 + 32, y: y * 64 + 32, looted: false });
+      else if (roll > .955) {
+        const kind = roll > .979 ? "tree" : roll > .968 ? "rock" : "bush";
+        this.resourceNodes.push({ x: x * 64 + 32, y: y * 64 + 32, kind, alive: true, amount: kind === "tree" ? 2 : kind === "rock" ? 2 : 1 });
+      }
     }
     this.message = "Perímetro abandonado · Busca suministros y evita a los infectados.";
     this.messageTime = 6;
@@ -143,9 +152,26 @@ export class WastelandScene {
   }
 
   interact() {
-    const box = this.crates.find(c => !c.looted && Math.hypot(c.x - this.player.x, c.y - this.player.y) < 58);
-    if (box) { box.looted = true; this.scrap += 2; this.message = "Caja saqueada · +2 chatarra"; }
-    else this.message = "No hay suministros cerca.";
+    const px = this.player.x, py = this.player.y;
+    const box = this.crates.filter(c => !c.looted).sort((a,b) => Math.hypot(a.x-px,a.y-py)-Math.hypot(b.x-px,b.y-py))[0];
+    if (box && Math.hypot(box.x-px,box.y-py) < 58) {
+      box.looted = true;
+      const roll = this.random(Math.floor(box.x), Math.floor(box.y));
+      const loot = roll > .66 ? ["madera", 2] : roll > .33 ? ["piedra", 2] : ["chatarra", 3];
+      this.resources[loot[0]] += loot[1];
+      this.scrap += loot[0] === "chatarra" ? loot[1] : 0;
+      this.message = "Caja saqueada · +" + loot[1] + " " + loot[0];
+      this.messageTime = 2.4;
+      return;
+    }
+    const node = this.resourceNodes.filter(n => n.alive).sort((a,b) => Math.hypot(a.x-px,a.y-py)-Math.hypot(b.x-px,b.y-py))[0];
+    if (node && Math.hypot(node.x-px,node.y-py) < 62) {
+      node.amount--;
+      const material = node.kind === "tree" ? "madera" : node.kind === "rock" ? "piedra" : "fibra";
+      this.resources[material] += 1;
+      if (node.amount <= 0) node.alive = false;
+      this.message = "Recurso recolectado · +1 " + material;
+    } else this.message = "No hay recursos ni cajas al alcance.";
     this.messageTime = 2;
   }
 
@@ -194,6 +220,20 @@ export class WastelandScene {
       renderer.line(x - 8, y - 6, x + 8, y + 7, "#4b3929", 2);
       renderer.line(x + 8, y - 6, x - 8, y + 7, "#4b3929", 2);
     }
+    // Recolectables del entorno: árboles, rocas y arbustos con estado persistente durante la sesión.
+    for (const node of this.resourceNodes) if (node.alive) {
+      const x = node.x - cx, y = node.y - cy;
+      if (x < -45 || y < -45 || x > w + 45 || y > h + 45) continue;
+      if (node.kind === "tree") this.drawNature(renderer, "tree", x, y, 40);
+      else if (node.kind === "rock") this.drawNature(renderer, "rock", x, y, 28);
+      else {
+        renderer.rect(x - 8, y - 4, 16, 10, "#49633a");
+        renderer.rect(x - 5, y - 8, 9, 8, "#668447");
+        renderer.rect(x - 2, y - 9, 3, 3, "#a0a65b");
+      }
+      renderer.rect(x - 11, y + 15, 22, 3, "#17201a");
+      renderer.rect(x - 11, y + 15, 22 * node.amount / (node.kind === "bush" ? 1 : 2), 3, "#c49a58");
+    }
     // Enemies
     for (const e of this.enemies) if (!e.dead) {
       const x = e.x - cx, y = e.y - cy;
@@ -228,6 +268,9 @@ export class WastelandScene {
     this.drawBar(renderer, 18, 49, 118, this.player.stamina, "#c2a34d", "RES");
     this.drawBar(renderer, 18, 63, 118, this.player.hunger, "#789653", "HAM");
     renderer.text("CHATARRA " + this.scrap, 145, 45, "#d6c79f", 9);
+    renderer.rect(10, 83, 254, 28, "rgba(8,13,12,.82)");
+    renderer.text("MADERA " + this.resources.madera + "   PIEDRA " + this.resources.piedra, 18, 95, "#e1d3b4", 9);
+    renderer.text("FIBRA " + this.resources.fibra + "   BOTIQUÍN " + this.medkits + "   COMIDA " + this.food, 18, 105, "#b8c6a0", 8);
     if (this.messageTime > 0) {
       const msgWidth = Math.min(w - 24, Math.max(180, this.message.length * 6.2 + 24));
       renderer.rect((w - msgWidth) / 2, 84, msgWidth, 26, "rgba(8,13,12,.85)");
