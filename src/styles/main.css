@@ -47,3 +47,7 @@ footer{padding:9px 4px 2px;color:#738491;font-size:9px;text-align:center}
  .rotate-notice strong{font-size:21px}.rotate-notice span{max-width:260px;color:var(--muted);line-height:1.5;font-size:14px}
 }
 .touch-actions{position:absolute;right:18px;bottom:18px;display:flex;gap:10px;z-index:4}.touch-actions button{width:62px;height:62px;border-radius:50%;border:2px solid #c99c58;background:#4a3426dd;color:#f3dfb6;font-size:10px;font-weight:800;touch-action:none;user-select:none;-webkit-user-select:none}.touch-actions button:first-child{width:72px;height:72px;background:#713c31e8;border-color:#d18a62}@media(orientation:landscape) and (max-height:600px){.touch-actions{right:18px;bottom:18px}.touch-actions button{width:56px;height:56px}.touch-actions button:first-child{width:66px;height:66px}}@media(orientation:portrait) and (max-width:900px){.touch-actions{display:none}}
+
+/* Wasteland gameplay HUD cleanup */
+.canvas-overlay{z-index:1;padding:2px 3px}.canvas-overlay span:first-child{font-weight:800;color:#e8d6ad;background:#111a18c9;padding:5px 8px;border-radius:4px}.canvas-overlay span:last-child{background:#111a18a8;padding:4px 7px;border-radius:4px}.control-hint{display:none}
+@media (orientation:landscape) and (max-height:600px){.canvas-overlay{inset:8px 12px auto}.toolbar{bottom:9px}.touch-actions{bottom:82px;right:20px}.touch-actions button{width:52px;height:52px}.touch-actions button:first-child{width:62px;height:62px}}
