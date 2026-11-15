@@ -13,6 +13,25 @@ export class WastelandScene {
     this.food = 3;
     this.selected = 0;
     this.worldSeed = 9137;
+    this.sprites = {};
+    this.loadSprite("grass", "./assets/wasteland/terrain/grass_base.png");
+    this.loadSprite("survivorIdle", "./assets/wasteland/characters/survivor_idle_down.png");
+    this.loadSprite("survivorWalk", "./assets/wasteland/characters/survivor_walk_down_0.png");
+    this.loadSprite("infectedIdle", "./assets/wasteland/enemies/infected_idle_down.png");
+    this.loadSprite("infectedWalk", "./assets/wasteland/enemies/infected_walk_down_0.png");
+  }
+
+  loadSprite(key, src) {
+    const image = new Image();
+    image.onload = () => { this.sprites[key] = image; };
+    image.src = src;
+  }
+
+  blit(renderer, key, x, y, width, height) {
+    const image = this.sprites[key];
+    if (!image) return false;
+    renderer.context.drawImage(image, Math.round(x - width / 2), Math.round(y - height / 2), width, height);
+    return true;
   }
 
   random(x, y) {
@@ -57,7 +76,8 @@ export class WastelandScene {
     for (const enemy of this.enemies) {
       if (enemy.dead) continue;
       const dx = p.x - enemy.x, dy = p.y - enemy.y, d = Math.hypot(dx, dy);
-      if (d < 260 && d > 22) { enemy.x += dx / d * enemy.speed * dt; enemy.y += dy / d * enemy.speed * dt; }
+      enemy.moving = d < 260 && d > 22;
+      if (enemy.moving) { enemy.x += dx / d * enemy.speed * dt; enemy.y += dy / d * enemy.speed * dt; }
       else if (d <= 22) { p.hp = Math.max(0, p.hp - 5 * dt); }
       enemy.hit = Math.max(0, enemy.hit - dt);
     }
@@ -105,9 +125,12 @@ export class WastelandScene {
     const left = Math.floor(cx / tile) - 1, top = Math.floor(cy / tile) - 1;
     for (let ty = top; ty < top + Math.ceil(h / tile) + 2; ty++) for (let tx = left; tx < left + Math.ceil(w / tile) + 2; tx++) {
       const n = this.random(tx, ty), x = tx * tile - cx, y = ty * tile - cy;
-      const color = n > .91 ? "#5a6048" : n > .78 ? "#394c38" : (tx + ty) % 2 ? "#2d4436" : "#304838";
-      this.drawTile(renderer, x, y, tile, color);
-      if (n > .94) { renderer.rect(x + 8, y + 10, 2, 2, "#83906a"); renderer.rect(x + 23, y + 22, 3, 2, "#202c25"); }
+      if (this.sprites.grass) renderer.context.drawImage(this.sprites.grass, Math.round(x), Math.round(y), tile, tile);
+      else {
+        const color = n > .91 ? "#5a6048" : n > .78 ? "#394c38" : (tx + ty) % 2 ? "#2d4436" : "#304838";
+        this.drawTile(renderer, x, y, tile, color);
+      }
+      if (n > .97) { renderer.rect(x + 8, y + 10, 2, 2, "#83906a"); renderer.rect(x + 23, y + 22, 3, 2, "#202c25"); }
     }
     // Ruined road crossing the sector
     const roadY = Math.floor(3 * tile - cy);
@@ -126,17 +149,21 @@ export class WastelandScene {
     for (const e of this.enemies) if (!e.dead) {
       const x = e.x - cx, y = e.y - cy;
       if (x < -35 || y < -35 || x > w + 35 || y > h + 35) continue;
-      renderer.rect(x - 8, y - 6, 16, 15, e.hit > 0 ? "#c7a58a" : "#78834c");
-      renderer.rect(x - 5, y - 13, 10, 8, "#9b9876");
-      renderer.rect(x - 4, y - 10, 2, 2, "#d95d48"); renderer.rect(x + 2, y - 10, 2, 2, "#d95d48");
+      if (!this.blit(renderer, e.moving ? "infectedWalk" : "infectedIdle", x, y, 32, 32)) {
+        renderer.rect(x - 8, y - 6, 16, 15, e.hit > 0 ? "#c7a58a" : "#78834c");
+        renderer.rect(x - 5, y - 13, 10, 8, "#9b9876");
+        renderer.rect(x - 4, y - 10, 2, 2, "#d95d48"); renderer.rect(x + 2, y - 10, 2, 2, "#d95d48");
+      }
       if (e.hp < e.maxHp) { renderer.rect(x - 10, y - 19, 20, 3, "#271d1b"); renderer.rect(x - 10, y - 19, 20 * e.hp / e.maxHp, 3, "#bd5946"); }
     }
     // Survivor
     const px = this.player.x - cx, py = this.player.y - cy;
-    renderer.rect(px - 8, py - 5, 16, 16, "#354b42");
-    renderer.rect(px - 6, py - 15, 12, 11, "#b18a61");
-    renderer.rect(px - 7, py - 17, 14, 4, "#282e2a");
-    renderer.rect(px - 7, py + 10, 5, 7, "#292721"); renderer.rect(px + 2, py + 10, 5, 7, "#292721");
+    if (!this.blit(renderer, Math.hypot(this.player.facingX, this.player.facingY) > .05 && this.time % .6 > .3 ? "survivorWalk" : "survivorIdle", px, py, 40, 40)) {
+      renderer.rect(px - 8, py - 5, 16, 16, "#354b42");
+      renderer.rect(px - 6, py - 15, 12, 11, "#b18a61");
+      renderer.rect(px - 7, py - 17, 14, 4, "#282e2a");
+      renderer.rect(px - 7, py + 10, 5, 7, "#292721"); renderer.rect(px + 2, py + 10, 5, 7, "#292721");
+    }
     if (this.player.attack > 0) renderer.circle(px + this.player.facingX * 18, py + this.player.facingY * 18, 3, "#f0d17b");
 
     // HUD is rendered by the engine renderer, not by a second canvas or external game loop.
