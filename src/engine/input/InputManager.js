@@ -23,6 +23,9 @@ export class InputManager {
     });
   }
 
+  // Kept as a per-frame hook so GameEngine can update all input devices uniformly.
+  update() {}
+
   onJoystickDown(event) {
     event.preventDefault();
     this.pointerId = event.pointerId;
