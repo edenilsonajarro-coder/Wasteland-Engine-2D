@@ -6,7 +6,7 @@ import { InputManager } from "./engine/input/InputManager.js?v=4";
 import { EventBus } from "./engine/events/EventBus.js?v=4";
 import { DebugOverlay } from "./engine/debug/DebugOverlay.js?v=4";
 import { TestScene } from "./scenes/TestScene.js?v=4";
-import { WastelandScene } from "./scenes/WastelandScene.js?v=4";
+import { WastelandScene } from "./scenes/WastelandScene.js?v=5";
 
 const canvas = document.querySelector("#game-canvas");
 const joystick = document.querySelector("#joystick");
