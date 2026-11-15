@@ -7,6 +7,17 @@ export class WastelandScene {
     this.crates = [];
     this.resources = { madera: 0, piedra: 0, fibra: 0, chatarra: 0 };
     this.resourceNodes = [];
+    this.structures = [];
+    this.storage = { madera: 0, piedra: 0, fibra: 0, chatarra: 0 };
+    this.inventoryOpen = false; this.craftOpen = false; this.buildMode = false; this.storageOpen = false;
+    this.equipment = { weapon: "Cuchillo" };
+    this.chunkCache = new Map();
+    this.recipes = [
+      {name:"Vendaje",cost:{fibra:3},run:()=>{this.medkits++;}},
+      {name:"Cuchillo reforzado",cost:{madera:2,piedra:2,chatarra:2},run:()=>{this.equipment.weapon="Cuchillo reforzado";this.player.damage=36;}},
+      {name:"Almacén",cost:{madera:6,piedra:2},run:()=>{this.buildMode=true;this.pendingBuild="storage";}},
+      {name:"Fogata",cost:{madera:4,piedra:3},run:()=>{this.buildMode=true;this.pendingBuild="campfire";}}
+    ];
     this.time = 0;
     this.message = "Explora el perímetro. Acércate a las cajas para saquear.";
     this.messageTime = 5;
@@ -23,7 +34,7 @@ export class WastelandScene {
 
   loadSprite(key, src) {
     const image = new Image();
-    image.onload = () => { this.sprites[key] = image; };
+    image.onload = () => { this.sprites[key] = image; this.chunkCache.clear(); };
     image.onerror = () => { console.warn("No se pudo cargar el recurso Wasteland:", src); };
     image.src = src;
   }
@@ -81,6 +92,8 @@ export class WastelandScene {
     this.enemies = [];
     this.crates = [];
     this.resourceNodes = [];
+    this.structures = []; this.storage = { madera:0,piedra:0,fibra:0,chatarra:0 };
+    this.inventoryOpen = this.craftOpen = this.buildMode = this.storageOpen = false;
     this.resources = { madera: 0, piedra: 0, fibra: 0, chatarra: 0 };
     for (let i = 0; i < 11; i++) {
       const a = i * 2.399;
@@ -130,6 +143,12 @@ export class WastelandScene {
       else if (d <= 22) { p.hp = Math.max(0, p.hp - 5 * dt); }
       enemy.hit = Math.max(0, enemy.hit - dt);
     }
+    if (input.isDown("KeyC") && !this.keyC) this.craftOpen = !this.craftOpen;
+    if (input.isDown("KeyI") && !this.keyI) this.inventoryOpen = !this.inventoryOpen;
+    if (input.isDown("KeyB") && !this.keyB) this.buildMode = !this.buildMode;
+    this.keyC=input.isDown("KeyC"); this.keyI=input.isDown("KeyI"); this.keyB=input.isDown("KeyB");
+    if (this.craftOpen) for(let i=1;i<=4;i++) if(input.isDown("Digit"+i)&&this.lastDigit!==i){this.craft(i-1);this.lastDigit=i;}
+    if (![1,2,3,4].some(i=>input.isDown("Digit"+i))) this.lastDigit=0;
     if ((input.isDown("Space") || input.isActionDown("attack")) && p.attack <= 0) this.attack();
     if ((input.isDown("KeyE") || input.isActionDown("interact")) && !this.interactHeld) { this.interact(); this.interactHeld = true; }
     if (!input.isDown("KeyE") && !input.isActionDown("interact")) this.interactHeld = false;
@@ -143,7 +162,7 @@ export class WastelandScene {
     for (const e of this.enemies) {
       if (e.dead) continue;
       if (Math.hypot(e.x - this.player.x, e.y - this.player.y) < 48) {
-        e.hp -= 24; e.hit = .2;
+        e.hp -= this.player.damage || 24; e.hit = .2;
         if (e.hp <= 0) { e.dead = true; this.scrap++; defeated++; }
       }
     }
@@ -151,7 +170,21 @@ export class WastelandScene {
     this.messageTime = 1.8;
   }
 
+  craft(index) {
+    const recipe=this.recipes[index]; if(!recipe)return;
+    if(!Object.entries(recipe.cost).every(([k,v])=>(this.resources[k]||0)>=v)){this.message="Materiales insuficientes";this.messageTime=2;return;}
+    for(const [k,v] of Object.entries(recipe.cost))this.resources[k]-=v;
+    recipe.run();this.message="Fabricado: "+recipe.name;this.messageTime=2.5;
+  }
+  placeStructure() {
+    const type=this.pendingBuild||"storage";
+    this.structures.push({type,x:Math.round((this.player.x+this.player.facingX*48)/32)*32,y:Math.round((this.player.y+this.player.facingY*48)/32)*32});
+    this.pendingBuild=null;this.buildMode=false;this.message="Construcción completada: "+type;this.messageTime=2.5;
+  }
   interact() {
+    if(this.buildMode&&this.pendingBuild){this.placeStructure();return;}
+    const nearby=this.structures.find(o=>o.type==="storage"&&Math.hypot(o.x-this.player.x,o.y-this.player.y)<62);
+    if(nearby){for(const k of Object.keys(this.resources)){this.storage[k]+=this.resources[k];this.resources[k]=0;}this.storageOpen=!this.storageOpen;this.message="Materiales depositados en el almacén";this.messageTime=2;return;}
     const px = this.player.x, py = this.player.y;
     const box = this.crates.filter(c => !c.looted).sort((a,b) => Math.hypot(a.x-px,a.y-py)-Math.hypot(b.x-px,b.y-py))[0];
     if (box && Math.hypot(box.x-px,box.y-py) < 58) {
@@ -187,26 +220,26 @@ export class WastelandScene {
   render(renderer) {
     const w = renderer.logicalWidth, h = renderer.logicalHeight, cx = this.camera.x, cy = this.camera.y;
     renderer.clear("#1b2923");
-    const tile = 32;
-    const left = Math.floor(cx / tile) - 1, top = Math.floor(cy / tile) - 1;
-    for (let ty = top; ty < top + Math.ceil(h / tile) + 2; ty++) for (let tx = left; tx < left + Math.ceil(w / tile) + 2; tx++) {
-      const n = this.random(tx, ty), x = tx * tile - cx, y = ty * tile - cy;
-      const terrainCol = n > .94 ? 5 : n > .87 ? 3 : n > .78 ? 1 : 0;
-      const terrainRow = n > .965 ? 2 : n > .91 ? 1 : 0;
-      if (!this.drawAtlasTile(renderer, terrainCol, terrainRow, x, y, tile)) {
-        const color = n > .91 ? "#5a6048" : n > .78 ? "#394c38" : (tx + ty) % 2 ? "#2d4436" : "#304838";
-        this.drawTile(renderer, x, y, tile, color);
+    const chunkSize=512, x0=Math.floor(cx/chunkSize), y0=Math.floor(cy/chunkSize), x1=Math.floor((cx+w)/chunkSize), y1=Math.floor((cy+h)/chunkSize);
+    for(let gy=y0;gy<=y1;gy++)for(let gx=x0;gx<=x1;gx++){
+      const key=gx+":"+gy;let chunk=this.chunkCache.get(key);
+      if(!chunk){
+        chunk=document.createElement("canvas");chunk.width=512;chunk.height=512;
+        const c=chunk.getContext("2d");c.imageSmoothingEnabled=false;
+        for(let ty=0;ty<16;ty++)for(let tx=0;tx<16;tx++){
+          const wx=gx*512+tx*32,wy=gy*512+ty*32,ix=Math.floor(wx/32),iy=Math.floor(wy/32),n=this.random(ix,iy);
+          const col=n>.94?5:n>.87?3:n>.78?1:0,row=n>.965?2:n>.91?1:0;
+          if(this.sprites.terrainAtlas)c.drawImage(this.sprites.terrainAtlas,col*16,row*16,16,16,tx*32,ty*32,32,32);
+          else{c.fillStyle=n>.91?"#5a6048":n>.78?"#394c38":((ix+iy)%2?"#2d4436":"#304838");c.fillRect(tx*32,ty*32,32,32);}
+          const d=this.random(ix+71,iy-19);
+          if(this.sprites.terrainAtlas&&d>.986){const src=d>.997?[64,48]:d>.993?[32,48]:[0,48];c.drawImage(this.sprites.terrainAtlas,src[0],src[1],32,48,tx*32-3,ty*32-8,38,48);}
+          else if(this.sprites.terrainAtlas&&d>.972)c.drawImage(this.sprites.terrainAtlas,96,48,32,48,tx*32+2,ty*32+2,27,27);
+        }
+        this.chunkCache.set(key,chunk);
       }
-      // Sparse, deterministic vegetation and stones; the same seed keeps the sector stable.
-      const decor = this.random(tx + 71, ty - 19);
-      if (decor > .986) {
-        const kind = decor > .997 ? "deadTree" : decor > .993 ? "pine" : "tree";
-        this.drawNature(renderer, kind, x + 16, y + 13, 38);
-      } else if (decor > .972) {
-        this.drawNature(renderer, "rock", x + 16, y + 16, 27);
-      }
-      if (n > .97) { renderer.rect(x + 8, y + 10, 2, 2, "#83906a"); renderer.rect(x + 23, y + 22, 3, 2, "#202c25"); }
+      renderer.context.drawImage(chunk,Math.round(gx*chunkSize-cx),Math.round(gy*chunkSize-cy));
     }
+    if(this.chunkCache.size>40){const keep=new Set();for(let gy=y0-1;gy<=y1+1;gy++)for(let gx=x0-1;gx<=x1+1;gx++)keep.add(gx+":"+gy);for(const key of this.chunkCache.keys())if(!keep.has(key))this.chunkCache.delete(key);}
     // Ruined road crossing the sector
     const roadY = Math.floor(3 * tile - cy);
     renderer.rect(0, roadY, w, 25, "#5a574b");
@@ -234,6 +267,7 @@ export class WastelandScene {
       renderer.rect(x - 11, y + 15, 22, 3, "#17201a");
       renderer.rect(x - 11, y + 15, 22 * node.amount / (node.kind === "bush" ? 1 : 2), 3, "#c49a58");
     }
+    for(const o of this.structures){const x=o.x-cx,y=o.y-cy;if(o.type==="storage"){renderer.rect(x-14,y-11,28,22,"#795333");renderer.rect(x-12,y-9,24,5,"#bd8b4d");renderer.line(x-10,y-6,x+10,y+8,"#3e3025",3);}else{renderer.circle(x,y,13,"#564332");renderer.circle(x,y,8,"#d17b37");renderer.circle(x,y,4,"#f4c46a");}}
     // Enemies
     for (const e of this.enemies) if (!e.dead) {
       const x = e.x - cx, y = e.y - cy;
@@ -271,6 +305,12 @@ export class WastelandScene {
     renderer.rect(10, 83, 254, 28, "rgba(8,13,12,.82)");
     renderer.text("MADERA " + this.resources.madera + "   PIEDRA " + this.resources.piedra, 18, 95, "#e1d3b4", 9);
     renderer.text("FIBRA " + this.resources.fibra + "   BOTIQUÍN " + this.medkits + "   COMIDA " + this.food, 18, 105, "#b8c6a0", 8);
+    if(this.craftOpen||this.inventoryOpen||this.storageOpen||this.buildMode){
+      renderer.rect(w-236,82,224,116,"rgba(8,13,12,.93)");
+      renderer.text(this.craftOpen?"FABRICACIÓN":this.inventoryOpen?"INVENTARIO":this.storageOpen?"ALMACÉN":"CONSTRUCCIÓN",w-224,99,"#e6d6ad",11);
+      if(this.craftOpen)this.recipes.forEach((r,i)=>renderer.text((i+1)+". "+r.name+" · "+Object.entries(r.cost).map(([k,v])=>v+" "+k).join(", "),w-224,119+i*17,"#d9dfd1",8));
+      else{renderer.text("Madera "+this.resources.madera+" · Piedra "+this.resources.piedra,w-224,121,"#d9dfd1",9);renderer.text("Fibra "+this.resources.fibra+" · Chatarra "+this.scrap,w-224,139,"#d9dfd1",9);renderer.text("Arma: "+this.equipment.weapon,w-224,157,"#d9dfd1",9);}
+    }
     if (this.messageTime > 0) {
       const msgWidth = Math.min(w - 24, Math.max(180, this.message.length * 6.2 + 24));
       renderer.rect((w - msgWidth) / 2, 84, msgWidth, 26, "rgba(8,13,12,.85)");
