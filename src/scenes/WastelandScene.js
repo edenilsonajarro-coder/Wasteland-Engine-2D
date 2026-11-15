@@ -14,24 +14,32 @@ export class WastelandScene {
     this.selected = 0;
     this.worldSeed = 9137;
     this.sprites = {};
-    this.loadSprite("grass", "./assets/wasteland/terrain/grass_base.png");
-    this.loadSprite("survivorIdle", "./assets/wasteland/characters/survivor_idle_down.png");
-    this.loadSprite("survivorWalk", "./assets/wasteland/characters/survivor_walk_down_0.png");
-    this.loadSprite("infectedIdle", "./assets/wasteland/enemies/infected_idle_down.png");
-    this.loadSprite("infectedWalk", "./assets/wasteland/enemies/infected_walk_down_0.png");
+    this.loadSprite("survivor", "./assets/wasteland/characters/survivor_scavenger_32px.png");
+    this.loadSprite("infected", "./assets/wasteland/enemies/infected_walker_32px.png");
   }
 
   loadSprite(key, src) {
     const image = new Image();
     image.onload = () => { this.sprites[key] = image; };
+    image.onerror = () => { console.warn("No se pudo cargar el recurso Wasteland:", src); };
     image.src = src;
   }
 
-  blit(renderer, key, x, y, width, height) {
+  drawSheetFrame(renderer, key, column, row, columns, x, y, size = 40) {
     const image = this.sprites[key];
     if (!image) return false;
-    renderer.context.drawImage(image, Math.round(x - width / 2), Math.round(y - height / 2), width, height);
+    const frameW = image.width / columns;
+    const frameH = frameW;
+    const sx = Math.max(0, Math.min(image.width - frameW, column * frameW));
+    const sy = Math.max(0, Math.min(image.height - frameH, row * frameH));
+    renderer.context.drawImage(image, sx, sy, frameW, frameH,
+      Math.round(x - size / 2), Math.round(y - size / 2), size, size);
     return true;
+  }
+
+  directionIndex(x, y) {
+    if (Math.abs(x) > Math.abs(y)) return x < 0 ? 1 : 2;
+    return y < 0 ? 3 : 0;
   }
 
   random(x, y) {
@@ -63,10 +71,12 @@ export class WastelandScene {
     const p = this.player;
     if (Math.hypot(move.x, move.y) > .05) {
       p.facingX = move.x; p.facingY = move.y;
+      p.facingDir = this.directionIndex(move.x, move.y);
+      p.moving = true;
       p.x += move.x * p.speed * dt;
       p.y += move.y * p.speed * dt;
       p.stamina = Math.max(0, p.stamina - 9 * dt);
-    } else p.stamina = Math.min(100, p.stamina + 8 * dt);
+    } else { p.moving = false; p.stamina = Math.min(100, p.stamina + 8 * dt); }
     p.hunger = Math.max(0, p.hunger - .018 * dt);
     if (p.hunger <= 0) p.hp = Math.max(1, p.hp - .6 * dt);
     p.attack = Math.max(0, p.attack - dt);
@@ -77,7 +87,11 @@ export class WastelandScene {
       if (enemy.dead) continue;
       const dx = p.x - enemy.x, dy = p.y - enemy.y, d = Math.hypot(dx, dy);
       enemy.moving = d < 260 && d > 22;
-      if (enemy.moving) { enemy.x += dx / d * enemy.speed * dt; enemy.y += dy / d * enemy.speed * dt; }
+      if (enemy.moving) {
+        enemy.facingDir = this.directionIndex(dx, dy);
+        enemy.x += dx / d * enemy.speed * dt;
+        enemy.y += dy / d * enemy.speed * dt;
+      }
       else if (d <= 22) { p.hp = Math.max(0, p.hp - 5 * dt); }
       enemy.hit = Math.max(0, enemy.hit - dt);
     }
@@ -149,7 +163,10 @@ export class WastelandScene {
     for (const e of this.enemies) if (!e.dead) {
       const x = e.x - cx, y = e.y - cy;
       if (x < -35 || y < -35 || x > w + 35 || y > h + 35) continue;
-      if (!this.blit(renderer, e.moving ? "infectedWalk" : "infectedIdle", x, y, 32, 32)) {
+      const enemyDir = e.facingDir ?? 0;
+      const enemyRow = (e.moving ? 4 : 0) + enemyDir;
+      const enemyFrame = e.moving ? Math.floor(this.time * 7) % 4 : Math.floor(this.time * 2.4) % 2;
+      if (!this.drawSheetFrame(renderer, "infected", enemyFrame, enemyRow, 4, x, y, 38)) {
         renderer.rect(x - 8, y - 6, 16, 15, e.hit > 0 ? "#c7a58a" : "#78834c");
         renderer.rect(x - 5, y - 13, 10, 8, "#9b9876");
         renderer.rect(x - 4, y - 10, 2, 2, "#d95d48"); renderer.rect(x + 2, y - 10, 2, 2, "#d95d48");
@@ -158,7 +175,10 @@ export class WastelandScene {
     }
     // Survivor
     const px = this.player.x - cx, py = this.player.y - cy;
-    if (!this.blit(renderer, Math.hypot(this.player.facingX, this.player.facingY) > .05 && this.time % .6 > .3 ? "survivorWalk" : "survivorIdle", px, py, 40, 40)) {
+    const playerDir = this.player.facingDir ?? 2;
+    const playerRow = (this.player.moving ? 4 : 0) + playerDir;
+    const playerFrame = this.player.moving ? Math.floor(this.time * 8.7) % 6 : Math.floor(this.time * 2.4) % 2;
+    if (!this.drawSheetFrame(renderer, "survivor", playerFrame, playerRow, 6, px, py, 42)) {
       renderer.rect(px - 8, py - 5, 16, 16, "#354b42");
       renderer.rect(px - 6, py - 15, 12, 11, "#b18a61");
       renderer.rect(px - 7, py - 17, 14, 4, "#282e2a");
