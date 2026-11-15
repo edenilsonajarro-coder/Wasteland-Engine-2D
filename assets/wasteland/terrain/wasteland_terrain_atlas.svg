@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" shape-rendering="crispEdges">
+<defs>
+<pattern id="grass" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#304a35"/><path d="M1 2h1M5 6h1M6 1h1" stroke="#536c42"/><path d="M3 5h1" stroke="#263b2e"/></pattern>
+<pattern id="dirt" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#79533b"/><path d="M1 2h2M5 5h2M3 7h1" stroke="#a7774e"/><path d="M6 1h1M2 6h1" stroke="#513b31"/></pattern>
+<pattern id="sand" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#b18a55"/><path d="M1 2h2M5 6h2M4 4h1" stroke="#d3b276"/></pattern>
+<pattern id="gravel" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#555950"/><path d="M1 1h2v2H1zM5 4h2v2H5z" fill="#85877a"/></pattern>
+<pattern id="crack" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#57483c"/><path d="M1 0 3 3 2 5 5 8M3 3 7 2" stroke="#b18a55" fill="none"/></pattern>
+<pattern id="toxic" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#3c552e"/><path d="M0 2h8M2 0v8" stroke="#a2b33c" opacity=".6"/><circle cx="6" cy="6" r="1" fill="#d1dc47"/></pattern>
+<pattern id="water" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#174f60"/><path d="M0 2q2-2 4 0t4 0M0 6q2-2 4 0t4 0" stroke="#3aa6b2" fill="none"/></pattern>
+<pattern id="road" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#666052"/><path d="M1 1h2M5 6h2" stroke="#8e8875"/></pattern>
+</defs>
+<rect width="128" height="128" fill="#263b2e"/>
+<g>
+<rect x="0" y="0" width="16" height="16" fill="url(#grass)"/><rect x="16" y="0" width="16" height="16" fill="url(#dirt)"/><rect x="32" y="0" width="16" height="16" fill="url(#sand)"/><rect x="48" y="0" width="16" height="16" fill="url(#gravel)"/><rect x="64" y="0" width="16" height="16" fill="url(#crack)"/><rect x="80" y="0" width="16" height="16" fill="url(#toxic)"/><rect x="96" y="0" width="16" height="16" fill="url(#water)"/><rect x="112" y="0" width="16" height="16" fill="url(#road)"/>
+<rect x="0" y="16" width="16" height="16" fill="url(#grass)"/><path d="M3 22h2m5 4h2m-8 3h2" stroke="#d7cf8a"/><rect x="16" y="16" width="16" height="16" fill="url(#dirt)"/><path d="M20 19h4m2 7h3" stroke="#bb885c"/><rect x="32" y="16" width="16" height="16" fill="url(#sand)"/><path d="M34 27h8m-5-4h3" stroke="#e0c68a"/><rect x="48" y="16" width="16" height="16" fill="url(#gravel)"/><path d="M51 21h3v2h-3zm7 5h3v2h-3z" fill="#b1b2a0"/><rect x="64" y="16" width="16" height="16" fill="url(#crack)"/><rect x="80" y="16" width="16" height="16" fill="url(#toxic)"/><rect x="96" y="16" width="16" height="16" fill="url(#water)"/><rect x="112" y="16" width="16" height="16" fill="url(#road)"/>
+<rect x="0" y="32" width="16" height="16" fill="url(#grass)"/><rect x="16" y="32" width="16" height="16" fill="url(#dirt)"/><rect x="32" y="32" width="16" height="16" fill="url(#sand)"/><rect x="48" y="32" width="16" height="16" fill="url(#gravel)"/><rect x="64" y="32" width="16" height="16" fill="url(#crack)"/><rect x="80" y="32" width="16" height="16" fill="url(#toxic)"/><rect x="96" y="32" width="16" height="16" fill="url(#water)"/><rect x="112" y="32" width="16" height="16" fill="url(#road)"/>
+</g>
+<g transform="translate(0 48)">
+<rect width="128" height="80" fill="none"/>
+<g transform="translate(8 4)"><path d="M8 30 6 40h4l1-10" fill="#62432f"/><circle cx="9" cy="17" r="10" fill="#426b3c"/><circle cx="4" cy="21" r="6" fill="#557e42"/><circle cx="14" cy="22" r="6" fill="#365d38"/><path d="M4 13h3m5 3h3" stroke="#8da34b"/></g>
+<g transform="translate(40 7)"><path d="M8 28 6 38h4l1-10" fill="#70513a"/><path d="M9 0 0 20h18z" fill="#31563c"/><path d="M9 7 2 24h14z" fill="#426c45"/><path d="M9 14 4 28h10z" fill="#54794a"/></g>
+<g transform="translate(75 8)"><path d="M9 27v14" stroke="#8b6848" stroke-width="4"/><path d="M9 2 4 10 7 10 2 18 8 18 4 27 15 27 11 18 17 18 12 10 15 10z" fill="#5b5747"/><path d="M7 10h4" stroke="#9c8e6b"/></g>
+<g transform="translate(104 8)"><path d="M0 28h18v9H0z" fill="#77766b"/><path d="M2 26 5 12 12 9 17 18 15 27z" fill="#969487"/><path d="M5 12 12 9 14 16 7 18z" fill="#c1bda4"/></g>
+<g transform="translate(7 48)"><path d="M0 9 6 0 15 3 19 12 12 17 3 15z" fill="#73766d"/><path d="M6 0 10 5 4 9" fill="none" stroke="#b1b39c" stroke-width="2"/></g>
+<g transform="translate(40 49)"><path d="M0 13 5 2 16 0 20 12 13 18 3 17z" fill="#5f6657"/><path d="M5 2 11 7 16 0" fill="none" stroke="#a3a88c" stroke-width="2"/></g>
+<g transform="translate(77 50)"><path d="M0 13q9-12 18 0v6H0z" fill="#7c5539"/><path d="M3 12h12M8 8v10" stroke="#c39458" stroke-width="2"/></g>
+<g transform="translate(109 50)"><path d="M0 14h18M3 10h12M5 6h8" stroke="#b27d47" stroke-width="3"/></g>
+</g></svg>
