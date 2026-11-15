@@ -5,6 +5,9 @@ export class InputManager {
     this.knob = knob;
     this.keys = new Set();
     this.axis = { x: 0, y: 0 };
+    this.actions = new Set();
+    this.bindActionButton("attack-control", "attack");
+    this.bindActionButton("interact-control", "interact");
     this.pointerId = null;
     this.boundKeyDown = (event) => {
       this.keys.add(event.code);
@@ -19,9 +22,23 @@ export class InputManager {
     this.joystick.addEventListener("pointercancel", this.onJoystickUp.bind(this));
     window.addEventListener("blur", () => {
       this.keys.clear();
+      this.actions.clear();
       this.resetJoystick();
     });
   }
+
+  bindActionButton(id, action) {
+    const button = document.getElementById(id);
+    if (!button) return;
+    const down = (event) => { event.preventDefault(); this.actions.add(action); };
+    const up = (event) => { event.preventDefault(); this.actions.delete(action); };
+    button.addEventListener("pointerdown", down);
+    button.addEventListener("pointerup", up);
+    button.addEventListener("pointercancel", up);
+    button.addEventListener("lostpointercapture", up);
+  }
+
+  isActionDown(action) { return this.actions.has(action); }
 
   // Kept as a per-frame hook so GameEngine can update all input devices uniformly.
   update() {}
