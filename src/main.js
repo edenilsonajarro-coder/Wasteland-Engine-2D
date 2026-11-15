@@ -1,11 +1,11 @@
-import { GameEngine } from "./engine/core/GameEngine.js";
-import { CanvasRenderer } from "./engine/graphics/CanvasRenderer.js";
-import { SceneManager } from "./engine/scenes/SceneManager.js";
-import { AssetManager } from "./engine/assets/AssetManager.js";
-import { InputManager } from "./engine/input/InputManager.js";
-import { EventBus } from "./engine/events/EventBus.js";
-import { DebugOverlay } from "./engine/debug/DebugOverlay.js";
-import { TestScene } from "./scenes/TestScene.js";
+import { GameEngine } from "./engine/core/GameEngine.js?v=4";
+import { CanvasRenderer } from "./engine/graphics/CanvasRenderer.js?v=4";
+import { SceneManager } from "./engine/scenes/SceneManager.js?v=4";
+import { AssetManager } from "./engine/assets/AssetManager.js?v=4";
+import { InputManager } from "./engine/input/InputManager.js?v=4";
+import { EventBus } from "./engine/events/EventBus.js?v=4";
+import { DebugOverlay } from "./engine/debug/DebugOverlay.js?v=4";
+import { TestScene } from "./scenes/TestScene.js?v=4";
 
 const canvas = document.querySelector("#game-canvas");
 const joystick = document.querySelector("#joystick");
