@@ -58,3 +58,22 @@ footer{padding:9px 4px 2px;color:#738491;font-size:9px;text-align:center}
 }
 
 @media (orientation:landscape) and (max-height:600px){.toolbar{left:8px;right:8px;justify-content:flex-end;gap:4px}.toolbar button{padding:5px 7px;font-size:8px;min-height:28px}}
+
+/* Pantalla completa: control siempre visible en la cabecera */
+.topbar{position:relative}
+.fullscreen-button{margin-left:auto;white-space:nowrap;border-color:#987044;background:#30271f;color:#f0d4a5;min-height:34px;padding:7px 11px;font-size:10px}
+.fullscreen-button:active{background:#59432b}
+:fullscreen{background:#10161d}
+.app-shell.is-fullscreen{position:fixed;inset:0;z-index:9999;width:100vw;height:100dvh;max-width:none;margin:0;padding:4px 8px;background:#10161d;display:flex;flex-direction:column}
+.app-shell.is-fullscreen .topbar{flex:0 0 auto}
+.app-shell.is-fullscreen .game-panel{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+.app-shell.is-fullscreen .canvas-wrap{flex:1;width:100%;height:auto;min-height:0;max-height:none;aspect-ratio:auto}
+.app-shell.is-fullscreen .toolbar{flex:0 0 auto}
+.app-shell.is-fullscreen .info-grid,.app-shell.is-fullscreen footer{display:none}
+@media (orientation:landscape) and (max-height:600px){
+ .fullscreen-button{min-height:28px;padding:4px 8px;font-size:8px}
+ .app-shell.is-fullscreen{padding:2px 6px}
+ .app-shell.is-fullscreen .topbar{padding:1px 3px 3px}
+ .app-shell.is-fullscreen .toolbar{position:absolute;right:8px;bottom:8px;z-index:5}
+}
+@media (orientation:portrait) and (max-width:900px){.fullscreen-button{display:none}}
