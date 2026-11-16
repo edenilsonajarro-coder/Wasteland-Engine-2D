@@ -29,7 +29,7 @@ export class WastelandScene {
     this.sprites = {};
     this.loadSprite("survivor", "./assets/wasteland/characters/survivor_scavenger_32px.png");
     this.loadSprite("infected", "./assets/wasteland/enemies/infected_walker_32px.png");
-    this.loadSprite("terrainAtlas", "./assets/wasteland/terrain/wasteland_terrain_atlas.svg");
+    this.loadSprite("terrainAtlas", "./assets/wasteland/terrain/wasteland_terrain_atlas.svg?v=2");
   }
 
   loadSprite(key, src) {
