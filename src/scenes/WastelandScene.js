@@ -241,7 +241,7 @@ export class WastelandScene {
     }
     if(this.chunkCache.size>40){const keep=new Set();for(let gy=y0-1;gy<=y1+1;gy++)for(let gx=x0-1;gx<=x1+1;gx++)keep.add(gx+":"+gy);for(const key of this.chunkCache.keys())if(!keep.has(key))this.chunkCache.delete(key);}
     // Ruined road crossing the sector
-    const roadY = Math.floor(3 * tile - cy);
+    const roadY = Math.floor(3 * 32 - cy);
     renderer.rect(0, roadY, w, 25, "#5a574b");
     renderer.line(0, roadY, w, roadY, "#817966", 2);
     // Scavenge crates

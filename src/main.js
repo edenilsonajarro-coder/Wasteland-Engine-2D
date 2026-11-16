@@ -6,7 +6,7 @@ import { InputManager } from "./engine/input/InputManager.js?v=5";
 import { EventBus } from "./engine/events/EventBus.js?v=4";
 import { DebugOverlay } from "./engine/debug/DebugOverlay.js?v=5";
 import { TestScene } from "./scenes/TestScene.js?v=4";
-import { WastelandScene } from "./scenes/WastelandScene.js?v=9";
+import { WastelandScene } from "./scenes/WastelandScene.js?v=10";
 
 const canvas = document.querySelector("#game-canvas");
 const joystick = document.querySelector("#joystick");
@@ -24,6 +24,7 @@ const pauseButton = document.querySelector("#pause-button");
 const sceneButton = document.querySelector("#scene-button");
 const debugButton = document.querySelector("#debug-button");
 const fullscreenButton = document.querySelector("#fullscreen-button");
+const fullscreenGameButton = document.querySelector("#fullscreen-game-button");
 const appShell = document.querySelector(".app-shell");
 
 events.on("engine:ready", () => { status.textContent = "EN EJECUCIÓN"; });
@@ -91,6 +92,7 @@ function updateFullscreenButton() {
   }
 }
 fullscreenButton?.addEventListener("click", toggleFullscreen);
+fullscreenGameButton?.addEventListener("click", toggleFullscreen);
 document.addEventListener("fullscreenchange", () => { updateFullscreenButton(); setTimeout(() => renderer.resize(), 120); });
 document.addEventListener("webkitfullscreenchange", () => { updateFullscreenButton(); setTimeout(() => renderer.resize(), 120); });
 window.addEventListener("resize", () => renderer.resize());
