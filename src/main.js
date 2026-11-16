@@ -50,10 +50,10 @@ pauseButton.addEventListener("click", () => {
   const paused = engine.togglePause();
   pauseButton.textContent = paused ? "Reanudar" : "Pausar";
 });
-sceneButton.addEventListener("click", () => {
+sceneButton?.addEventListener("click", () => {
   scenes.switchTo(scenes.currentName === "wasteland" ? "test" : "wasteland");
 });
-debugButton.addEventListener("click", () => {
+debugButton?.addEventListener("click", () => {
   const visible = debug.toggle();
   debugButton.textContent = `Depuración: ${visible ? "ON" : "OFF"}`;
   debugButton.setAttribute("aria-pressed", String(visible));
